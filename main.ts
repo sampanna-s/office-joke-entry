@@ -1,14 +1,16 @@
 import { mkdirSync, renameSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-// One-line office joke: setup (focus time blocked off) -> turn (a meeting
-// is booked over it) -> punchline (the meeting is about focus time itself).
-const JOKE =
-  "My calendar blocked out 'focus time', so my manager booked a meeting over it titled 'quick chat about focus time'.";
+const joke = "I replied all by accident and gained 212 witnesses, which is the closest our office has come to transparency.";
+const outputDir = process.env.MAKEFUN_OUTPUT_DIR || "/output";
 
-const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
-mkdirSync(outDir, { recursive: true });
-// Write to a temp name and rename, so entry.txt is never half-written.
-const tmp = join(outDir, `.entry.txt.tmp-${process.pid}`);
-writeFileSync(tmp, JOKE, "utf8");
-renameSync(tmp, join(outDir, "entry.txt"));
+const characterCount = [...joke].length;
+if (characterCount < 1 || characterCount > 200 || joke.trim().length === 0 || /[\r\n]/.test(joke)) {
+  throw new Error("entry text must be one non-blank line of 1 to 200 characters");
+}
+
+mkdirSync(outputDir, { recursive: true });
+const target = join(outputDir, "entry.txt");
+const temporary = `${target}.tmp`;
+writeFileSync(temporary, joke, "utf8");
+renameSync(temporary, target);
